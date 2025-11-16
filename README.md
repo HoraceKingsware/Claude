@@ -283,13 +283,36 @@ RETRY_DELAY=2.0
 - 尝试切换AI提供商
 - 查看验证码截图是否清晰
 
-#### 3. 浏览器启动失败
+#### 3. greenlet编译失败
 
-- 确认已安装Playwright浏览器：`playwright install`
+如果在安装依赖时遇到 `Failed building wheel for greenlet` 错误：
+
+```bash
+# 1. 安装编译工具（如果还没安装）
+apt-get update && apt-get install -y python3-dev gcc g++ build-essential
+
+# 2. 升级pip和安装工具
+pip install --user --upgrade pip setuptools wheel
+
+# 3. 重新安装依赖
+pip install -r requirements.txt
+
+# 4. 安装Playwright浏览器
+python3 -m playwright install chromium
+```
+
+验证安装：
+```bash
+python3 test_setup.py
+```
+
+#### 4. 浏览器启动失败
+
+- 确认已安装Playwright浏览器：`python3 -m playwright install chromium`
 - 检查系统依赖：`playwright install-deps`
 - 尝试切换浏览器类型
 
-#### 4. 反爬虫检测
+#### 5. 反爬虫检测
 
 - 启用反检测：`ENABLE_STEALTH=True`
 - 增加操作延迟：调大 `RANDOM_DELAY_MAX`
