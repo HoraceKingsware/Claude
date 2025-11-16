@@ -176,13 +176,35 @@ class BrowserAutomation:
 
         await self.random_delay(0.2, 0.5)
 
-    async def navigate(self, url: str) -> None:
-        """导航到指定URL"""
+    async def navigate(self, url: str, wait_until: str = "domcontentloaded", timeout: Optional[int] = None) -> None:
+        """
+        导航到指定URL
+
+        Args:
+            url: 目标URL
+            wait_until: 等待策略 (load, domcontentloaded, networkidle, commit)
+            timeout: 超时时间（毫秒），None使用默认值
+        """
         if not self.page:
             raise RuntimeError("Browser not initialized")
 
         logger.info(f"Navigating to: {url}")
-        await self.page.goto(url, wait_until="networkidle")
+
+        try:
+            # 使用domcontentloaded代替networkidle，更快更稳定
+            timeout_ms = timeout or (Config.PAGE_LOAD_TIMEOUT * 1000)
+            await self.page.goto(url, wait_until=wait_until, timeout=timeout_ms)
+            logger.info(f"Page loaded with {wait_until} strategy")
+        except Exception as e:
+            logger.warning(f"Navigation with {wait_until} failed: {e}, trying with load strategy")
+            # 如果失败，尝试更宽松的策略
+            try:
+                await self.page.goto(url, wait_until="commit", timeout=timeout_ms)
+                logger.info("Page loaded with commit strategy")
+            except Exception as e2:
+                logger.error(f"Navigation failed completely: {e2}")
+                raise
+
         await self.random_delay()
 
     async def screenshot(self, path: str) -> None:
