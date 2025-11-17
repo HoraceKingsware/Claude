@@ -1,0 +1,37 @@
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Data Validation & ORM
+pydantic==2.5.0
+pydantic-settings==2.1.0
+sqlalchemy==2.0.25
+
+# Document Processing
+PyMuPDF==1.23.8
+python-docx==1.1.0
+openpyxl==3.1.2
+python-pptx==0.6.23
+beautifulsoup4==4.12.2
+chardet==5.2.0
+lxml==4.9.4
+
+# Vector Database & Embeddings
+chromadb==0.4.22
+sentence-transformers==2.3.1
+
+# Knowledge Graph
+networkx==3.2.1
+
+# RAG Framework
+langchain==0.1.0
+langchain-community==0.0.20
+
+# LLM SDKs
+zhipuai==2.0.1
+anthropic==0.18.1
+
+# Utilities
+python-dotenv==1.0.0
+aiofiles==23.2.1
