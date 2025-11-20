@@ -1,0 +1,7 @@
+# 微信文章URL列表示例
+# 每行一个URL，以#开头的行是注释
+
+# 中科星图文章示例
+https://mp.weixin.qq.com/s?__biz=MzAwNDk0NTE2Mw==&mid=2247549245&idx=2&sn=01b92012e86f23b66ce0843addfa0080&chksm=9a68f4750ddb369caa053adf9f2a854182cc91e68e117e91d7fe1411f960fc31aa64e839c7a0
+
+# 在这里添加更多URL...
