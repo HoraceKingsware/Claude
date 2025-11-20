@@ -274,13 +274,15 @@ class WeChatScraper:
             title = title_tag.get_text(strip=True) if title_tag else ''
 
             # 提取作者/公众号名称
-            author_tag = soup.find('a', class_='rich_media_meta rich_media_meta_link rich_media_meta_nickname')
-            if not author_tag:
-                author_tag = soup.find('span', class_='rich_media_meta rich_media_meta_text')
+            author_tag = soup.find('span', class_='rich_media_meta_nickname')
             if not author_tag:
                 author_tag = soup.find('strong', class_='profile_nickname')
             if not author_tag:
                 author_tag = soup.find('div', id='js_name')
+            if not author_tag:
+                author_tag = soup.find('a', class_='rich_media_meta_link')
+            if not author_tag:
+                author_tag = soup.find('span', class_='rich_media_meta_text')
             author = author_tag.get_text(strip=True) if author_tag else ''
 
             # 提取发布时间
@@ -339,26 +341,32 @@ class WeChatScraper:
             # 尝试多种方式提取公众号名称
             account_name = None
 
-            # 方法1: 查找 profile_nickname
-            nickname_tag = soup.find('strong', class_='profile_nickname')
+            # 方法1: 查找 rich_media_meta_nickname (span标签) - 最常见的方式
+            nickname_tag = soup.find('span', class_='rich_media_meta_nickname')
             if nickname_tag:
                 account_name = nickname_tag.get_text(strip=True)
 
-            # 方法2: 查找 js_name
+            # 方法2: 查找 profile_nickname
+            if not account_name:
+                nickname_tag = soup.find('strong', class_='profile_nickname')
+                if nickname_tag:
+                    account_name = nickname_tag.get_text(strip=True)
+
+            # 方法3: 查找 js_name
             if not account_name:
                 name_tag = soup.find('div', id='js_name')
                 if name_tag:
                     account_name = name_tag.get_text(strip=True)
 
-            # 方法3: 查找 rich_media_meta_nickname
+            # 方法4: 查找 rich_media_meta_link (a标签)
             if not account_name:
-                meta_tag = soup.find('a', class_='rich_media_meta rich_media_meta_link rich_media_meta_nickname')
+                meta_tag = soup.find('a', class_='rich_media_meta_link')
                 if meta_tag:
                     account_name = meta_tag.get_text(strip=True)
 
-            # 方法4: 查找任何包含公众号信息的 meta 标签
+            # 方法5: 查找任何包含公众号信息的 meta 标签
             if not account_name:
-                meta_tag = soup.find('span', class_='rich_media_meta rich_media_meta_text')
+                meta_tag = soup.find('span', class_='rich_media_meta_text')
                 if meta_tag:
                     account_name = meta_tag.get_text(strip=True)
 
