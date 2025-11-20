@@ -210,6 +210,10 @@ class WeChatScraper:
                         title = link_tag.get_text(strip=True)
                         link = link_tag.get('href', '')
 
+                        # 修复相对路径：补全域名
+                        if link and link.startswith('/'):
+                            link = 'https://weixin.sogou.com' + link
+
                         # 提取发布时间
                         time_tag = news.find('span', class_='s2')
                         pub_time = time_tag.get_text(strip=True) if time_tag else ''
