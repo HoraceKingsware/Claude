@@ -273,10 +273,14 @@ class WeChatScraper:
             title_tag = soup.find('h1', class_='rich_media_title')
             title = title_tag.get_text(strip=True) if title_tag else ''
 
-            # 提取作者
+            # 提取作者/公众号名称
             author_tag = soup.find('a', class_='rich_media_meta rich_media_meta_link rich_media_meta_nickname')
             if not author_tag:
                 author_tag = soup.find('span', class_='rich_media_meta rich_media_meta_text')
+            if not author_tag:
+                author_tag = soup.find('strong', class_='profile_nickname')
+            if not author_tag:
+                author_tag = soup.find('div', id='js_name')
             author = author_tag.get_text(strip=True) if author_tag else ''
 
             # 提取发布时间
@@ -302,4 +306,69 @@ class WeChatScraper:
 
         except Exception as e:
             print(f"获取文章内容时出错: {e}")
+            return None
+
+    def get_account_name_from_url(self, url: str) -> Optional[str]:
+        """
+        从文章URL中提取公众号名称
+
+        Args:
+            url: 微信文章URL
+
+        Returns:
+            公众号名称，如果提取失败返回None
+        """
+        print(f"正在从文章中提取公众号信息...")
+
+        try:
+            # 随机延时
+            self._random_sleep(1, 2)
+
+            response = self._request_with_retry(
+                url,
+                referer='https://mp.weixin.qq.com/'
+            )
+
+            if not response:
+                print("无法访问文章")
+                return None
+
+            response.encoding = 'utf-8'
+            soup = BeautifulSoup(response.text, 'lxml')
+
+            # 尝试多种方式提取公众号名称
+            account_name = None
+
+            # 方法1: 查找 profile_nickname
+            nickname_tag = soup.find('strong', class_='profile_nickname')
+            if nickname_tag:
+                account_name = nickname_tag.get_text(strip=True)
+
+            # 方法2: 查找 js_name
+            if not account_name:
+                name_tag = soup.find('div', id='js_name')
+                if name_tag:
+                    account_name = name_tag.get_text(strip=True)
+
+            # 方法3: 查找 rich_media_meta_nickname
+            if not account_name:
+                meta_tag = soup.find('a', class_='rich_media_meta rich_media_meta_link rich_media_meta_nickname')
+                if meta_tag:
+                    account_name = meta_tag.get_text(strip=True)
+
+            # 方法4: 查找任何包含公众号信息的 meta 标签
+            if not account_name:
+                meta_tag = soup.find('span', class_='rich_media_meta rich_media_meta_text')
+                if meta_tag:
+                    account_name = meta_tag.get_text(strip=True)
+
+            if account_name:
+                print(f"✓ 找到公众号: {account_name}")
+                return account_name
+            else:
+                print("✗ 未能提取公众号名称")
+                return None
+
+        except Exception as e:
+            print(f"提取公众号名称时出错: {e}")
             return None
